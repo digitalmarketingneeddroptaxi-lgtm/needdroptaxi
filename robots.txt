@@ -1,4 +1,11 @@
 User-agent: *
 Allow: /
 
+# Block stray/obsolete pages
+Disallow: /images/profile-pics/pathi.html
+Disallow: /NeedDropTaxi/
+
+# Block HTTrack-generated paths (safety net)
+Disallow: /needdroptaxi.com/
+
 Sitemap: https://needdroptaxi.com/sitemap.xml

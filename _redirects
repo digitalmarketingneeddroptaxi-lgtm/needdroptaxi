@@ -1,0 +1,43 @@
+# ============================================================
+# Need Drop Taxi - Cloudflare Pages Redirects
+# All rules use 301 Permanent Redirects
+# ============================================================
+
+# --- Duplicate domain-in-path redirects ---
+# Catches /needdroptaxi.com/ and all nested variants
+/needdroptaxi.com/  /  301
+/needdroptaxi.com   /  301
+/needdroptaxi.com/index.html  /  301
+/needdroptaxi.com/index.htm   /  301
+
+# Wildcard catch-all for any /needdroptaxi.com/<page> → /<page>
+/needdroptaxi.com/*  /:splat  301
+
+# --- /index.html and /index.htm redirects ---
+/index.html  /  301
+/index.htm   /  301
+
+# --- HTTrack default page (safety net) ---
+/NeedDropTaxi/  /  301
+/NeedDropTaxi   /  301
+/NeedDropTaxi/*  /:splat  301
+
+# --- Stray non-canonical pages (410 Gone) ---
+# /images/profile-pics/pathi.html is a misplaced page with no valid content
+/images/profile-pics/pathi.html  /  410
+
+# --- Trailing slash normalization for major pages ---
+# Cloudflare Pages handles this automatically for directory-index files,
+# but these explicit rules ensure edge cases are covered.
+/about  /about/  301
+/blog  /blog/  301
+/contact  /contact/  301
+/drop-taxi  /drop-taxi/  301
+/outstation-taxi-service  /outstation-taxi-service/  301
+/local-rental-taxi-service  /local-rental-taxi-service/  301
+/airport-transfer-taxi-service  /airport-transfer-taxi-service/  301
+/taxi-booking  /taxi-booking/  301
+/trip-fare-calculator  /trip-fare-calculator/  301
+/privacy-policy  /privacy-policy/  301
+/terms-and-conditions  /terms-and-conditions/  301
+/thank-you-booking  /thank-you-booking/  301
