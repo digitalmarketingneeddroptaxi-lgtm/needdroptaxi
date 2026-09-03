@@ -1,6 +1,6 @@
 # ============================================================
 # Need Drop Taxi - Cloudflare Pages Redirects
-# All rules use 301 Permanent Redirects
+# All rules use 301 Permanent Redirects unless noted
 # ============================================================
 
 # --- Duplicate domain-in-path redirects ---
@@ -10,7 +10,7 @@
 /needdroptaxi.com/index.html  /  301
 /needdroptaxi.com/index.htm   /  301
 
-# Wildcard catch-all for any /needdroptaxi.com/<page> → /<page>
+# Wildcard catch-all for any /needdroptaxi.com/<page> -> /<page>
 /needdroptaxi.com/*  /:splat  301
 
 # --- /index.html and /index.htm redirects ---
@@ -22,13 +22,15 @@
 /NeedDropTaxi   /  301
 /NeedDropTaxi/*  /:splat  301
 
+# --- Cloudflare email protection artifacts (HTTrack remnant) ---
+/cdn-cgi/l/email-protection  /contact/  301
+/cdn-cgi/l/email-protection.html  /contact/  301
+/cdn-cgi/*  /  301
+
 # --- Stray non-canonical pages (410 Gone) ---
-# /images/profile-pics/pathi.html is a misplaced page with no valid content
 /images/profile-pics/pathi.html  /  410
 
 # --- Trailing slash normalization for major pages ---
-# Cloudflare Pages handles this automatically for directory-index files,
-# but these explicit rules ensure edge cases are covered.
 /about  /about/  301
 /blog  /blog/  301
 /contact  /contact/  301

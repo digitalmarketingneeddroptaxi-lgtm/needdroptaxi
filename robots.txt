@@ -8,4 +8,20 @@ Disallow: /NeedDropTaxi/
 # Block HTTrack-generated paths (safety net)
 Disallow: /needdroptaxi.com/
 
+# Block Cloudflare email protection artifacts (HTTrack remnant)
+Disallow: /cdn-cgi/
+
+# Block thank-you page from indexing (post-conversion, no SEO value)
+Disallow: /thank-you-booking/
+
+# Explicitly allow major crawlers
+User-agent: AhrefsBot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: bingbot
+Allow: /
+
 Sitemap: https://needdroptaxi.com/sitemap.xml
