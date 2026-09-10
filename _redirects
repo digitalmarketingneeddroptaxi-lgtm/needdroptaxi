@@ -3,21 +3,18 @@
 # All rules use 301 Permanent Redirects unless noted
 # ============================================================
 
-# --- Duplicate domain-in-path redirects ---
-# Catches /needdroptaxi.com/ and all nested variants
+# --- Duplicate domain-in-path redirects (HTTrack cleanup) ---
 /needdroptaxi.com/  /  301
 /needdroptaxi.com   /  301
 /needdroptaxi.com/index.html  /  301
 /needdroptaxi.com/index.htm   /  301
-
-# Wildcard catch-all for any /needdroptaxi.com/<page> -> /<page>
 /needdroptaxi.com/*  /:splat  301
 
-# --- /index.html and /index.htm redirects ---
+# --- /index.html and /index.htm normalization ---
 /index.html  /  301
 /index.htm   /  301
 
-# --- HTTrack default page (safety net) ---
+# --- HTTrack default directory (safety net) ---
 /NeedDropTaxi/  /  301
 /NeedDropTaxi   /  301
 /NeedDropTaxi/*  /:splat  301
@@ -25,16 +22,71 @@
 # --- Cloudflare email protection artifacts (HTTrack remnant) ---
 /cdn-cgi/l/email-protection  /contact/  301
 /cdn-cgi/l/email-protection.html  /contact/  301
-/cdn-cgi/*  /  301
 
 # --- Stray non-canonical pages (410 Gone) ---
 /images/profile-pics/pathi.html  /  410
 
-# --- Trailing slash normalization for major pages ---
+# --- Parent /drop-taxi/ redirect ---
+/drop-taxi/  /outstation-taxi-service/  301
+/drop-taxi   /outstation-taxi-service/  301
+
+# --- Legacy Author URL normalization ---
+/author/pathi/  /blog/author/pathi/  301
+/author/pathi   /blog/author/pathi/  301
+/author/*       /blog/author/pathi/  301
+
+# --- Legacy destination routes without /drop-taxi/ prefix ---
+/bangalore-to-chennai/  /drop-taxi/bangalore-to-chennai/  301
+/bangalore-to-chennai   /drop-taxi/bangalore-to-chennai/  301
+/bangalore-to-coimbatore/  /drop-taxi/bangalore-to-coimbatore/  301
+/bangalore-to-coimbatore   /drop-taxi/bangalore-to-coimbatore/  301
+/chennai-to-bangalore/  /drop-taxi/chennai-to-bangalore/  301
+/chennai-to-bangalore   /drop-taxi/chennai-to-bangalore/  301
+/chennai-to-madurai/  /drop-taxi/chennai-to-madurai/  301
+/chennai-to-madurai   /drop-taxi/chennai-to-madurai/  301
+/chennai-to-tirupati/  /drop-taxi/chennai-to-tirupati/  301
+/chennai-to-tirupati   /drop-taxi/chennai-to-tirupati/  301
+/chennai-to-tiruvannamalai/  /drop-taxi/chennai-to-tiruvannamalai/  301
+/chennai-to-tiruvannamalai   /drop-taxi/chennai-to-tiruvannamalai/  301
+/chennai-to-trichy/  /drop-taxi/chennai-to-trichy/  301
+/chennai-to-trichy   /drop-taxi/chennai-to-trichy/  301
+/coimbatore-to-bangalore/  /drop-taxi/coimbatore-to-bangalore/  301
+/coimbatore-to-bangalore   /drop-taxi/coimbatore-to-bangalore/  301
+/kanyakumari-to-madurai/  /drop-taxi/kanyakumari-to-madurai/  301
+/kanyakumari-to-madurai   /drop-taxi/kanyakumari-to-madurai/  301
+/kanyakumari-to-rameshwaram/  /drop-taxi/kanyakumari-to-rameshwaram/  301
+/kanyakumari-to-rameshwaram   /drop-taxi/kanyakumari-to-rameshwaram/  301
+/madurai-to-chennai/  /drop-taxi/madurai-to-chennai/  301
+/madurai-to-chennai   /drop-taxi/madurai-to-chennai/  301
+/madurai-to-kanyakumari/  /drop-taxi/madurai-to-kanyakumari/  301
+/madurai-to-kanyakumari   /drop-taxi/madurai-to-kanyakumari/  301
+/madurai-to-rameshwaram/  /drop-taxi/madurai-to-rameshwaram/  301
+/madurai-to-rameshwaram   /drop-taxi/madurai-to-rameshwaram/  301
+/madurai-to-thoothukudi/  /drop-taxi/madurai-to-thoothukudi/  301
+/madurai-to-thoothukudi   /drop-taxi/madurai-to-thoothukudi/  301
+/madurai-to-tiruchendur/  /drop-taxi/madurai-to-tiruchendur/  301
+/madurai-to-tiruchendur   /drop-taxi/madurai-to-tiruchendur/  301
+/madurai-to-tirunelveli/  /drop-taxi/madurai-to-tirunelveli/  301
+/madurai-to-tirunelveli   /drop-taxi/madurai-to-tirunelveli/  301
+/rameshwaram-to-kanyakumari/  /drop-taxi/rameshwaram-to-kanyakumari/  301
+/rameshwaram-to-kanyakumari   /drop-taxi/rameshwaram-to-kanyakumari/  301
+/rameshwaram-to-madurai/  /drop-taxi/rameshwaram-to-madurai/  301
+/rameshwaram-to-madurai   /drop-taxi/rameshwaram-to-madurai/  301
+/thoothukudi-to-madurai/  /drop-taxi/thoothukudi-to-madurai/  301
+/thoothukudi-to-madurai   /drop-taxi/thoothukudi-to-madurai/  301
+/tiruchendur-to-madurai/  /drop-taxi/tiruchendur-to-madurai/  301
+/tiruchendur-to-madurai   /drop-taxi/tiruchendur-to-madurai/  301
+/tirunelveli-to-madurai/  /drop-taxi/tirunelveli-to-madurai/  301
+/tirunelveli-to-madurai   /drop-taxi/tirunelveli-to-madurai/  301
+/tirupati-to-chennai/  /drop-taxi/tirupati-to-chennai/  301
+/tirupati-to-chennai   /drop-taxi/tirupati-to-chennai/  301
+/trichy-to-chennai/  /drop-taxi/trichy-to-chennai/  301
+/trichy-to-chennai   /drop-taxi/trichy-to-chennai/  301
+
+# --- Trailing slash normalization for main pages ---
 /about  /about/  301
 /blog  /blog/  301
 /contact  /contact/  301
-/drop-taxi  /drop-taxi/  301
 /outstation-taxi-service  /outstation-taxi-service/  301
 /local-rental-taxi-service  /local-rental-taxi-service/  301
 /airport-transfer-taxi-service  /airport-transfer-taxi-service/  301
