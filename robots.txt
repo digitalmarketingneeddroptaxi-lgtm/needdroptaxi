@@ -4,6 +4,11 @@ Allow: /
 # Block non-indexable utility & conversion pages
 Disallow: /thank-you-booking/
 
+# Block tracking-parameter URLs to prevent "Alternate page with proper canonical tag" in GSC
+# These URLs are functionally identical to the canonical — ?ref= and ?service= are analytics-only params
+Disallow: /taxi-booking/?
+Disallow: /trip-fare-calculator/?
+
 # Block stray/obsolete paths & scrapers
 Disallow: /images/profile-pics/pathi.html
 Disallow: /NeedDropTaxi/
