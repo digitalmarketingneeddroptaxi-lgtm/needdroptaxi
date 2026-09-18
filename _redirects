@@ -85,8 +85,6 @@
 
 # --- Tracking parameter stripping (prevents GSC "Alternate page with proper canonical tag") ---
 # Any URL like /taxi-booking/?ref=... or /trip-fare-calculator/?service=... is redirected to the clean canonical
-/taxi-booking/*  /taxi-booking/  301
-/trip-fare-calculator/*  /trip-fare-calculator/  301
 
 # --- Trailing slash normalization for main pages ---
 /about  /about/  301
