@@ -1,0 +1,7 @@
+.env
+.env.local
+.env.*.local
+node_modules/
+ahrefs_paths.json
+endpoint_summary.json
+schema_definitions.json

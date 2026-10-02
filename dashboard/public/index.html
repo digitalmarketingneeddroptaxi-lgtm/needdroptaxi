@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Need Drop Taxi — Ahrefs SEO Analytics & Technical Audit Dashboard</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fffbeb',
+              100: '#fef3c7',
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+              900: '#78350f'
+            },
+            ahrefs: {
+              blue: '#0058ff',
+              orange: '#ff5a00',
+              dark: '#111827'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .animate-subtle { animation: pulse-subtle 2s infinite ease-in-out; }
+    .badge-pos-top3 { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .badge-pos-top10 { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+    .badge-pos-mid { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
+    .badge-pos-low { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo & Branding -->
+        <div class="flex items-center gap-3">
+          <a href="/" class="flex items-center gap-2" title="Go to Need Drop Taxi Website">
+            <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-amber-400 text-slate-900 font-extrabold text-xl shadow-sm">
+              🚖
+            </span>
+            <div>
+              <div class="font-bold text-slate-900 leading-tight flex items-center gap-1.5">
+                Need Drop Taxi
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">Ahrefs v3</span>
+              </div>
+              <p class="text-xs text-slate-500">SEO Analytics & Technical Audit Dashboard</p>
+            </div>
+          </a>
+        </div>
+
+        <!-- Target Domain & Status -->
+        <div class="hidden md:flex items-center gap-3">
+          <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 text-xs">
+            <span class="text-slate-500">Target:</span>
+            <span id="targetBadge" class="font-semibold text-slate-800">https://needdroptaxi.com/</span>
+          </div>
+
+          <div id="keyStatusBadge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">
+            <span class="w-2 h-2 rounded-full bg-amber-500 animate-subtle"></span>
+            <span id="keyStatusText">Checking API Key...</span>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="flex items-center gap-2">
+          <button id="refreshDataBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition" title="Force refresh live data from Ahrefs API">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Refresh
+          </button>
+
+          <button id="openKeyModalBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+            API Settings
+          </button>
+
+          <a href="/" target="_blank" class="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-medium transition" title="View live Need Drop Taxi website">
+            Live Site ↗
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUB-NAVIGATION / TABS -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-100">
+      <nav class="flex space-x-1 sm:space-x-4 overflow-x-auto py-2.5" id="navTabs">
+        <button data-tab="overview" class="tab-btn px-3 py-1.5 rounded-md text-sm font-semibold transition bg-blue-50 text-blue-700">
+          📊 Overview
+        </button>
+        <button data-tab="site-audit" class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium transition text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+          🛠️ Site Audit
+        </button>
+        <button data-tab="keywords" class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium transition text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+          🔍 Organic Keywords
+        </button>
+        <button data-tab="backlinks" class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium transition text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+          🔗 Backlinks
+        </button>
+        <button data-tab="top-pages" class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium transition text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+          📄 Top Pages
+        </button>
+        <button data-tab="competitors" class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium transition text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+          ⚔️ Competitors
+        </button>
+        <button data-tab="lighthouse" class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium transition text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+          🤖 AI & Lighthouse
+        </button>
+        <button data-tab="reports" class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium transition text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+          📑 Reports & Export
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+    <!-- NOTICE / ALERT BANNER (Dynamic) -->
+    <div id="statusAlert" class="hidden mb-6 p-4 rounded-xl border text-sm flex items-start gap-3 shadow-sm">
+      <div id="statusAlertIcon" class="mt-0.5 text-lg">ℹ️</div>
+      <div class="flex-1">
+        <h4 id="statusAlertTitle" class="font-bold text-slate-900"></h4>
+        <p id="statusAlertDesc" class="text-slate-600 mt-0.5 text-xs sm:text-sm"></p>
+      </div>
+      <button onclick="document.getElementById('statusAlert').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 text-sm">✕</button>
+    </div>
+
+    <!-- ==================== TAB 1: OVERVIEW ==================== -->
+    <section id="tab-overview" class="tab-content space-y-6">
+      <!-- Sync Info Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Domain Performance Overview</h2>
+          <p class="text-xs text-slate-500">Live metrics extracted from Ahrefs API v3 Site Explorer & Subscription Info</p>
+        </div>
+        <div class="flex items-center gap-3 text-xs text-slate-500">
+          <span>Last Sync: <strong id="lastSyncLabel" class="text-slate-700">Connecting...</strong></span>
+          <span class="text-slate-300">•</span>
+          <span>Target Mode: <strong class="text-slate-700">Subdomains</strong></span>
+        </div>
+      </div>
+
+      <!-- KPI METRIC CARDS -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <!-- Domain Rating -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+            <span>Domain Rating</span>
+            <span class="text-blue-500">⭐</span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="kpiDR" class="text-3xl font-extrabold text-slate-900">--</span>
+            <span id="kpiAhrefsRank" class="text-xs text-slate-400">AR: --</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-400">Ahrefs DR (0-100)</p>
+        </div>
+
+        <!-- Organic Traffic -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+            <span>Org. Traffic</span>
+            <span class="text-emerald-500">📈</span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="kpiTraffic" class="text-3xl font-extrabold text-slate-900">--</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-400">Monthly organic visits</p>
+        </div>
+
+        <!-- Organic Keywords -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+            <span>Org. Keywords</span>
+            <span class="text-indigo-500">🎯</span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="kpiKeywords" class="text-3xl font-extrabold text-slate-900">--</span>
+            <span id="kpiKeywordsTop3" class="text-xs text-emerald-600 font-medium">Top 3: --</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-400">Total ranked keywords</p>
+        </div>
+
+        <!-- Referring Domains -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+            <span>Ref. Domains</span>
+            <span class="text-purple-500">🌐</span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="kpiRefdomains" class="text-3xl font-extrabold text-slate-900">--</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-400">Live referring domains</p>
+        </div>
+
+        <!-- Backlinks -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+            <span>Total Backlinks</span>
+            <span class="text-cyan-500">🔗</span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="kpiBacklinks" class="text-3xl font-extrabold text-slate-900">--</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-400">Live inbound backlinks</p>
+        </div>
+
+        <!-- Health Score / Site Audit -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+            <span>Health Score</span>
+            <span class="text-amber-500">🩺</span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="kpiHealthScore" class="text-3xl font-extrabold text-slate-900">--</span>
+            <span class="text-xs text-slate-400">/100</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-400" id="kpiIssuesTotal">Site Audit Status</p>
+        </div>
+      </div>
+
+      <!-- CHARTS SECTION -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Keyword Rankings Distribution -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <span>Keyword Position Tiers</span>
+            </h3>
+            <span class="text-xs text-slate-400">Ahrefs Position Distribution</span>
+          </div>
+          <div class="h-64 flex items-center justify-center">
+            <canvas id="rankingTiersChart"></canvas>
+          </div>
+        </div>
+
+        <!-- API Consumption & Plan Limits -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span>Ahrefs API Units & Plan Limits</span>
+              </h3>
+              <span id="planBadge" class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">Standard Plan</span>
+            </div>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-xs text-slate-600 mb-1">
+                  <span>API Key Units Used</span>
+                  <span id="unitsUsageText">0 / --</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                  <div id="unitsUsageBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 pt-2">
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                  <span class="text-xs text-slate-400 block">Billing Reset Date</span>
+                  <span id="resetDateText" class="text-sm font-bold text-slate-800">--</span>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                  <span class="text-xs text-slate-400 block">Workspace Units</span>
+                  <span id="workspaceUnitsText" class="text-sm font-bold text-slate-800">--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 flex items-center justify-between">
+            <span>Rate limit: 60 req/min (Official v3 API)</span>
+            <span class="text-emerald-600 font-medium">15m Cache Active</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick SEO Opportunities Table -->
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900">Striking Distance Keywords (Positions 4–10 & 11–20)</h3>
+            <p class="text-xs text-slate-500">High-priority ranking opportunities for Need Drop Taxi to reach Top 3</p>
+          </div>
+          <button onclick="switchTab('keywords')" class="text-xs text-blue-600 hover:text-blue-700 font-semibold">
+            View All Keywords →
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">Keyword</th>
+                <th class="py-2.5 px-3">Position</th>
+                <th class="py-2.5 px-3">Volume</th>
+                <th class="py-2.5 px-3">Est. Traffic</th>
+                <th class="py-2.5 px-3">Ranking URL</th>
+                <th class="py-2.5 px-3">Action Opportunity</th>
+              </tr>
+            </thead>
+            <tbody id="strikingDistanceBody" class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td colspan="6" class="py-6 text-center text-slate-400">Loading keywords...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: SITE AUDIT / TECHNICAL SEO ==================== -->
+    <section id="tab-site-audit" class="tab-content space-y-6 hidden">
+      <!-- Site Audit Header -->
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Technical SEO & Site Audit Health</h2>
+          <p class="text-xs text-slate-500">Live audit projects, error tracking, metadata and crawler diagnostics</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="siteAuditProjectSelect" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg px-3 py-1.5 focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Select Audit Project...</option>
+          </select>
+          <button id="loadAuditBtn" class="bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-700">
+            Load Project
+          </button>
+        </div>
+      </div>
+
+      <!-- Sub-Tabs for Site Audit -->
+      <div class="flex border-b border-slate-200 gap-2">
+        <button data-subtab="audit-overview" class="audit-subtab-btn pb-2 text-xs font-semibold border-b-2 border-blue-600 text-blue-600">
+          Overview
+        </button>
+        <button data-subtab="audit-errors" class="audit-subtab-btn pb-2 text-xs font-medium text-slate-500 hover:text-slate-800">
+          Errors (<span id="auditErrorsCount">0</span>)
+        </button>
+        <button data-subtab="audit-warnings" class="audit-subtab-btn pb-2 text-xs font-medium text-slate-500 hover:text-slate-800">
+          Warnings (<span id="auditWarningsCount">0</span>)
+        </button>
+        <button data-subtab="audit-notices" class="audit-subtab-btn pb-2 text-xs font-medium text-slate-500 hover:text-slate-800">
+          Notices (<span id="auditNoticesCount">0</span>)
+        </button>
+        <button data-subtab="audit-pages" class="audit-subtab-btn pb-2 text-xs font-medium text-slate-500 hover:text-slate-800">
+          Crawled Pages
+        </button>
+      </div>
+
+      <!-- Site Audit Content Box -->
+      <div id="siteAuditContent" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm min-h-[300px]">
+        <div id="siteAuditPlaceholder" class="text-center py-12 text-slate-400">
+          <div class="text-4xl mb-3">🛠️</div>
+          <h4 class="font-semibold text-slate-700">Site Audit Explorer</h4>
+          <p class="text-xs text-slate-500 max-w-md mx-auto mt-1">
+            Site Audit endpoints query official Ahrefs <code class="bg-slate-100 px-1 py-0.5 rounded">/site-audit/projects</code> and <code class="bg-slate-100 px-1 py-0.5 rounded">/site-audit/issues</code>.
+          </p>
+          <button onclick="loadSiteAuditProjects()" class="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-lg transition">
+            Fetch Available Projects
+          </button>
+        </div>
+
+        <div id="siteAuditLoadedView" class="hidden space-y-6">
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl">
+              <span class="text-xs font-semibold text-emerald-800">Health Score</span>
+              <div id="auditHealthScoreVal" class="text-3xl font-extrabold text-emerald-900 mt-1">--</div>
+            </div>
+            <div class="bg-red-50 border border-red-200 p-4 rounded-xl">
+              <span class="text-xs font-semibold text-red-800">Total Errors</span>
+              <div id="auditErrorsVal" class="text-3xl font-extrabold text-red-900 mt-1">--</div>
+            </div>
+            <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl">
+              <span class="text-xs font-semibold text-amber-800">Total Warnings</span>
+              <div id="auditWarningsVal" class="text-3xl font-extrabold text-amber-900 mt-1">--</div>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl">
+              <span class="text-xs font-semibold text-blue-800">Total Notices</span>
+              <div id="auditNoticesVal" class="text-3xl font-extrabold text-blue-900 mt-1">--</div>
+            </div>
+          </div>
+
+          <!-- Issues Table -->
+          <div>
+            <h4 class="font-bold text-slate-900 text-sm mb-3">Detected Technical Issues</h4>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="py-2.5 px-3">Issue Name</th>
+                    <th class="py-2.5 px-3">Category</th>
+                    <th class="py-2.5 px-3">Importance</th>
+                    <th class="py-2.5 px-3">Total Crawled</th>
+                    <th class="py-2.5 px-3">Added</th>
+                    <th class="py-2.5 px-3">Recommended Fix</th>
+                  </tr>
+                </thead>
+                <tbody id="siteAuditIssuesBody" class="divide-y divide-slate-100 text-slate-700">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: ORGANIC KEYWORDS ==================== -->
+    <section id="tab-keywords" class="tab-content space-y-6 hidden">
+      <!-- Filter Bar -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h2 class="text-base font-bold text-slate-900">Organic Keywords Ranking</h2>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-500">Position Filters:</span>
+            <div class="flex items-center gap-1" id="keywordTierFilters">
+              <button data-filter="all" class="kw-tier-btn px-2.5 py-1 rounded text-xs font-semibold bg-blue-600 text-white">All</button>
+              <button data-filter="1-3" class="kw-tier-btn px-2.5 py-1 rounded text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200">1–3</button>
+              <button data-filter="4-10" class="kw-tier-btn px-2.5 py-1 rounded text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200">4–10</button>
+              <button data-filter="11-20" class="kw-tier-btn px-2.5 py-1 rounded text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200">11–20</button>
+              <button data-filter="21-50" class="kw-tier-btn px-2.5 py-1 rounded text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200">21–50</button>
+              <button data-filter="51-100" class="kw-tier-btn px-2.5 py-1 rounded text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200">51–100</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-100 text-xs">
+          <div class="flex-1 min-w-[200px]">
+            <input type="text" id="keywordSearchInput" placeholder="Filter by keyword (e.g. drop taxi, chennai)..." class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+          <div class="flex-1 min-w-[200px]">
+            <input type="text" id="keywordUrlSearchInput" placeholder="Filter by ranking URL..." class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+          <button id="loadKeywordsBtn" class="bg-blue-600 text-white font-semibold px-4 py-1.5 rounded-lg hover:bg-blue-700 transition">
+            Fetch Keywords
+          </button>
+        </div>
+      </div>
+
+      <!-- Keywords Table -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-200 flex items-center justify-between text-xs text-slate-500">
+          <span>Showing <strong id="keywordsCountLabel" class="text-slate-800">0</strong> keywords</span>
+          <span>Endpoint: <code class="bg-slate-100 px-1 py-0.5 rounded">/site-explorer/organic-keywords</code></span>
+        </div>
+        <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-600 font-semibold sticky top-0 border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">Keyword</th>
+                <th class="py-2.5 px-3">Current Pos.</th>
+                <th class="py-2.5 px-3">Prev. Pos</th>
+                <th class="py-2.5 px-3">Volume</th>
+                <th class="py-2.5 px-3">Est. Traffic</th>
+                <th class="py-2.5 px-3">Ranking URL</th>
+                <th class="py-2.5 px-3">Country</th>
+                <th class="py-2.5 px-3">Search Intent</th>
+              </tr>
+            </thead>
+            <tbody id="keywordsTableBody" class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td colspan="8" class="py-8 text-center text-slate-400">Click "Fetch Keywords" to query live keywords from Ahrefs API.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: BACKLINKS ==================== -->
+    <section id="tab-backlinks" class="tab-content space-y-6 hidden">
+      <!-- Backlinks Sub-Tabs -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div class="flex space-x-2">
+          <button data-backlink-tab="all" class="bl-subtab-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700">
+            All Backlinks
+          </button>
+          <button data-backlink-tab="refdomains" class="bl-subtab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100">
+            Referring Domains
+          </button>
+          <button data-backlink-tab="broken" class="bl-subtab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100">
+            Broken Backlinks
+          </button>
+        </div>
+
+        <button id="loadBacklinksBtn" class="bg-blue-600 text-white font-semibold text-xs px-4 py-1.5 rounded-lg hover:bg-blue-700 transition">
+          Fetch Backlink Data
+        </button>
+      </div>
+
+      <!-- Backlinks Display Table -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-200 flex items-center justify-between text-xs text-slate-500">
+          <span id="backlinksHeaderSubtitle">Live inbound links from /site-explorer/all-backlinks</span>
+          <span>Target: needdroptaxi.com</span>
+        </div>
+        <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+          <table class="w-full text-left text-xs" id="backlinksTable">
+            <thead class="bg-slate-50 text-slate-600 font-semibold sticky top-0 border-b border-slate-200" id="backlinksTableHead">
+              <!-- Dynamically populated based on subtab -->
+            </thead>
+            <tbody id="backlinksTableBody" class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td colspan="7" class="py-8 text-center text-slate-400">Click "Fetch Backlink Data" to load links.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 5: TOP PAGES ==================== -->
+    <section id="tab-top-pages" class="tab-content space-y-6 hidden">
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">Top-Performing Landing Pages</h2>
+          <p class="text-xs text-slate-500">Pages generating organic traffic and driving taxi bookings</p>
+        </div>
+        <button id="loadTopPagesBtn" class="bg-blue-600 text-white font-semibold text-xs px-4 py-1.5 rounded-lg hover:bg-blue-700 transition">
+          Fetch Top Pages
+        </button>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-600 font-semibold sticky top-0 border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">Landing Page URL</th>
+                <th class="py-2.5 px-3">Organic Traffic</th>
+                <th class="py-2.5 px-3">Keywords</th>
+                <th class="py-2.5 px-3">Top Keyword</th>
+                <th class="py-2.5 px-3">Top Pos.</th>
+                <th class="py-2.5 px-3">Search Volume</th>
+                <th class="py-2.5 px-3">Referring Domains</th>
+                <th class="py-2.5 px-3">Performance Status</th>
+              </tr>
+            </thead>
+            <tbody id="topPagesTableBody" class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td colspan="8" class="py-8 text-center text-slate-400">Click "Fetch Top Pages" to load pages.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 6: COMPETITORS ==================== -->
+    <section id="tab-competitors" class="tab-content space-y-6 hidden">
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Competitor Organic Comparison</h2>
+            <p class="text-xs text-slate-500">Benchmark Need Drop Taxi against competitors in the Tamil Nadu / South India taxi market</p>
+          </div>
+          <button id="loadCompetitorsBtn" class="bg-blue-600 text-white font-semibold text-xs px-4 py-1.5 rounded-lg hover:bg-blue-700 transition">
+            Analyze Competitors
+          </button>
+        </div>
+        <div class="flex items-center gap-2 pt-2 border-t border-slate-100 text-xs text-slate-600">
+          <span>Country: <strong>India (IN)</strong></span>
+          <span class="text-slate-300">•</span>
+          <span>Endpoint: <code class="bg-slate-100 px-1 py-0.5 rounded">/site-explorer/organic-competitors</code></span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-600 font-semibold sticky top-0 border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">Competitor Domain</th>
+                <th class="py-2.5 px-3">Domain Rating (DR)</th>
+                <th class="py-2.5 px-3">Common Keywords</th>
+                <th class="py-2.5 px-3">Competitor Total Keywords</th>
+                <th class="py-2.5 px-3">Need Drop Taxi Keywords</th>
+                <th class="py-2.5 px-3">Est. Traffic</th>
+                <th class="py-2.5 px-3">Ranking Pages</th>
+              </tr>
+            </thead>
+            <tbody id="competitorsTableBody" class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td colspan="7" class="py-8 text-center text-slate-400">Click "Analyze Competitors" to load organic competitor benchmarks.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB: LIGHTHOUSE & AI ==================== -->
+    <section id="tab-lighthouse" class="tab-content space-y-6 hidden">
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">AI & Lighthouse Audit</h2>
+          <p class="text-xs text-slate-500">Free Core Web Vitals and local AI SEO insights powered by Ollama</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="runLighthouseBtn" class="bg-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-lg hover:bg-blue-700">
+            Run Lighthouse Scan
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-center">
+          <div class="text-xs font-semibold text-slate-500 mb-2">Performance</div>
+          <div id="lhPerf" class="text-3xl font-extrabold text-slate-900">--</div>
+        </div>
+        <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-center">
+          <div class="text-xs font-semibold text-slate-500 mb-2">Accessibility</div>
+          <div id="lhAccess" class="text-3xl font-extrabold text-slate-900">--</div>
+        </div>
+        <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-center">
+          <div class="text-xs font-semibold text-slate-500 mb-2">Best Practices</div>
+          <div id="lhBest" class="text-3xl font-extrabold text-slate-900">--</div>
+        </div>
+        <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-center">
+          <div class="text-xs font-semibold text-slate-500 mb-2">SEO</div>
+          <div id="lhSeo" class="text-3xl font-extrabold text-slate-900">--</div>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-slate-900">🤖 Local AI SEO Insights</h3>
+          <button id="generateAiInsightsBtn" class="bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-emerald-700">
+            Generate Insights (Ollama)
+          </button>
+        </div>
+        <div id="aiInsightsContent" class="p-4 bg-slate-50 border border-slate-100 rounded-lg text-sm text-slate-700 whitespace-pre-wrap min-h-[150px]">
+          Click "Generate Insights" to ask your local AI model (Llama3) to analyze the Lighthouse scores and suggest improvements.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 7: REPORTS & EXPORT ==================== -->
+    <section id="tab-reports" class="tab-content space-y-6 hidden">
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Need Drop Taxi — SEO Performance Report</h2>
+          <p class="text-xs text-slate-500">Executive SEO summary, priority actions, and instant CSV/PDF export</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="exportCsvBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition">
+            📥 Export CSV
+          </button>
+          <button id="printReportBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold shadow-sm transition">
+            🖨️ Print / Save PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Report Card Document -->
+      <div id="printableReport" class="bg-white p-8 rounded-xl border border-slate-200 shadow-sm space-y-6">
+        <!-- Header -->
+        <div class="border-b border-slate-200 pb-4 flex justify-between items-center">
+          <div>
+            <h1 class="text-xl font-bold text-slate-900">Need Drop Taxi — SEO Status & Technical Audit</h1>
+            <p class="text-xs text-slate-500 mt-1">Generated via Official Ahrefs API v3 • Target: https://needdroptaxi.com/</p>
+          </div>
+          <div class="text-right text-xs text-slate-400">
+            <div>Report Date: <strong id="reportDateVal" class="text-slate-700">--</strong></div>
+            <div>Status: <span class="text-emerald-600 font-semibold">Active Sync</span></div>
+          </div>
+        </div>
+
+        <!-- Metric Highlights -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="p-3 rounded-lg bg-slate-50 border border-slate-100">
+            <span class="text-xs text-slate-400">Domain Rating</span>
+            <div id="reportDR" class="text-2xl font-bold text-slate-900 mt-0.5">--</div>
+          </div>
+          <div class="p-3 rounded-lg bg-slate-50 border border-slate-100">
+            <span class="text-xs text-slate-400">Organic Traffic</span>
+            <div id="reportTraffic" class="text-2xl font-bold text-slate-900 mt-0.5">--</div>
+          </div>
+          <div class="p-3 rounded-lg bg-slate-50 border border-slate-100">
+            <span class="text-xs text-slate-400">Organic Keywords</span>
+            <div id="reportKeywords" class="text-2xl font-bold text-slate-900 mt-0.5">--</div>
+          </div>
+          <div class="p-3 rounded-lg bg-slate-50 border border-slate-100">
+            <span class="text-xs text-slate-400">Referring Domains</span>
+            <div id="reportRefdomains" class="text-2xl font-bold text-slate-900 mt-0.5">--</div>
+          </div>
+        </div>
+
+        <!-- Priority Actions Section -->
+        <div>
+          <h3 class="text-sm font-bold text-slate-900 mb-2">Priority SEO Action Items</h3>
+          <ul class="space-y-2 text-xs text-slate-700">
+            <li class="flex items-start gap-2">
+              <span class="text-amber-500 font-bold">1.</span>
+              <span><strong>Boost Striking-Distance Keywords (Positions 4–10):</strong> Optimize internal linking from high-authority pages to Chennai-to-Outstation route pages to push keywords into Positions 1–3.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-500 font-bold">2.</span>
+              <span><strong>Maintain GSC Parameter Hygiene:</strong> Ensure tracking parameters (<code>?ref=</code>, <code>?service=</code>) on <a href="/taxi-booking/" class="text-blue-600">/taxi-booking/</a> and <a href="/trip-fare-calculator/" class="text-blue-600">/trip-fare-calculator/</a> continue canonicalizing cleanly to prevent duplicate index bloat.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-500 font-bold">3.</span>
+              <span><strong>Local Entity Schema Validation:</strong> Confirm <code>TaxiService</code> and <code>LocalBusiness</code> schema on Chennai and Tamil Nadu service areas are consistently recognized.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>Need Drop Taxi — Ahrefs API v3 Enterprise Integration</div>
+      <div class="flex items-center gap-3">
+        <span>Attribution: Domain Rating & Backlink data by Ahrefs</span>
+        <span>•</span>
+        <a href="https://docs.ahrefs.com/docs/api/reference/introduction" target="_blank" class="text-blue-600 hover:underline">API Documentation ↗</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== MODAL: API KEY SETTINGS ==================== -->
+  <div id="keyModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">🔑</span>
+          <h3 class="font-bold text-slate-900">Ahrefs API v3 Credentials</h3>
+        </div>
+        <button id="closeKeyModalBtn" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+
+      <p class="text-xs text-slate-500 mb-4">
+        Your API key is sent directly to the local backend server via secure POST and stored safely in server memory. It is never exposed in client JavaScript or rendered on public HTML.
+      </p>
+
+      <form id="keyForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Ahrefs API Key</label>
+          <input type="password" id="apiKeyInput" placeholder="Enter your Ahrefs API Key" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-blue-500 focus:border-blue-500" required />
+          <p class="text-[10px] text-slate-400 mt-1">Get your API key from <a href="https://app.ahrefs.com/account/api-keys" target="_blank" class="text-blue-600 hover:underline">Account settings → API keys</a>.</p>
+        </div>
+
+        <div id="keyModalFeedback" class="text-xs hidden p-2.5 rounded-lg"></div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" id="testKeyBtn" class="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-semibold transition">
+            Test Connection
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition shadow-sm">
+            Save & Authenticate
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script src="/app.js"></script>
+</body>
+</html>
