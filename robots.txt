@@ -14,4 +14,32 @@ Disallow: /images/profile-pics/pathi.html
 Disallow: /NeedDropTaxi/
 Disallow: /needdroptaxi.com/
 
+# === AI Crawlers: Explicitly Allowed ===
+# These bots power AI search engines and LLM-based assistants.
+# Allowing them ensures Need Drop Taxi appears in AI-generated answers.
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
 Sitemap: https://needdroptaxi.com/sitemap.xml
