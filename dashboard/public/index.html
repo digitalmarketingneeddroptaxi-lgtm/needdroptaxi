@@ -48,8 +48,73 @@
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
-<!-- InstantAlt Autonomous Remediation Agent -->
-<script src="/agent.js" data-agent-id="agent-ia-8f3c2e1a" async></script>
+<!-- InstantAlt Autonomous Remediation Agent v2.0 -->
+<script>
+(function(agentId) {
+  'use strict';
+  window.__INSTANTALT_AGENT_ID__ = agentId;
+  document.documentElement.setAttribute('data-instantalt-agent', agentId);
+
+  // 1. Approved remediation dictionary from InstantAlt Dashboard
+  var REMEDIATION_MAP = {
+    'taxi-p1-768-512-90': 'Need Drop Taxi - Outstation and local cab booking service vehicle in Chennai',
+    'new-ndt-logo': 'Need Drop Taxi Official Logo',
+    'trip_fare_estimator_mockup': 'Trip Fare Estimator Mobile App Interface'
+  };
+
+  // 2. DOM Remediation Engine
+  function remediateImages() {
+    var images = document.querySelectorAll('img');
+    var count = 0;
+
+    images.forEach(function(img) {
+      var alt = img.getAttribute('alt');
+      // Fix if alt is completely missing or empty string
+      if (alt === null || alt.trim() === '') {
+        var src = img.src || img.getAttribute('src') || '';
+        var matched = false;
+
+        // Check against approved dashboard fixes
+        for (var key in REMEDIATION_MAP) {
+          if (src.indexOf(key) !== -1) {
+            img.setAttribute('alt', REMEDIATION_MAP[key]);
+            img.setAttribute('data-instantalt', 'remediated');
+            matched = true;
+            count++;
+            break;
+          }
+        }
+
+        // Contextual fallback for any new unmapped images
+        if (!matched) {
+          var filename = (src.split('/').pop().split('?')[0] || 'image').replace(/[-_.]/g, ' ').replace(/\.[^/.]+$/, '');
+          img.setAttribute('alt', 'Need Drop Taxi - ' + filename);
+          img.setAttribute('data-instantalt', 'auto-fallback');
+          count++;
+        }
+      }
+    });
+
+    if (count > 0) {
+      console.log('InstantAlt Agent [' + agentId + ']: Remediated ' + count + ' image(s) with accessible alt text.');
+    }
+  }
+
+  // 3. Execute on DOM ready + watch dynamic DOM changes (Astro transitions/SPAs)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', remediateImages);
+  } else {
+    remediateImages();
+  }
+
+  if (window.MutationObserver) {
+    var observer = new MutationObserver(function() {
+      remediateImages();
+    });
+    observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
+  }
+})('agent-ia-8f3c2e1a');
+</script>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col">
 
